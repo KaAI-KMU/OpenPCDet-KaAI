@@ -16,7 +16,7 @@ OpenPCDet에서 KaAI dataset을 이용해 모델을 훈련시킬 수 있도록 �
 
 ### run pre-annotation
     python tools/pre_annotation.py --cfg_file ${CONFIG_FILE} --ckpt ${CKPT}
-    
+
     # example
     python tools/pre_annotation.py --cfg_file cfgs/kaai_models/pv_rcnn.yaml --ckpt pv_rcnn_80_epochs.pth
 
