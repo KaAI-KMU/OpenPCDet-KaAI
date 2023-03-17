@@ -20,8 +20,9 @@ OpenPCDet에서 KaAI dataset을 이용해 모델을 훈련시킬 수 있도록 �
     # example
     python tools/pre_annotation.py --cfg_file cfgs/kaai_models/pv_rcnn.yaml --ckpt pv_rcnn_80_epochs.pth
 
-원하는 모델과 checkpoint를 쓰고 돌리면 됩니다.
+원하는 모델과 checkpoint를 쓰고 위 코드를 터미널에 입력하면 됩니다.
 checkpoint는 OpenPCDet 원본 깃허브에서 다운받을 수 있습니다.
 https://github.com/open-mmlab/OpenPCDet#model-zoo
+다운받았거나 훈련한 모델의 checkpoint는 OpenPCDet-KaAI/tools에 넣습니다.
 
 3/17 : 현재는 pv_rcnn.yaml만 제공합니다
