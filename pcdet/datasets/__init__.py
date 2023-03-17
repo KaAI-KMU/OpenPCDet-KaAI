@@ -12,6 +12,7 @@ from .waymo.waymo_dataset import WaymoDataset
 from .pandaset.pandaset_dataset import PandasetDataset
 from .lyft.lyft_dataset import LyftDataset
 from .once.once_dataset import ONCEDataset
+from .kaai.kaai_dataset import KaAIDataset
 from .custom.custom_dataset import CustomDataset
 
 __all__ = {
@@ -22,6 +23,7 @@ __all__ = {
     'PandasetDataset': PandasetDataset,
     'LyftDataset': LyftDataset,
     'ONCEDataset': ONCEDataset,
+    'KaAIDataset': KaAIDataset,
     'CustomDataset': CustomDataset
 }
 
