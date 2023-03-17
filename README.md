@@ -8,7 +8,7 @@ OpenPCDet에서 KaAI dataset을 이용해 모델을 훈련시킬 수 있도록 �
 
 ## Pre-Annotation for KaAI dataset
 
-### Imageset generation
+### Imageet generation
     python -m pcdet.datasets.kaai.kaai_dataset generate_imagesets tools/cfgs/dataset_configs/kaai_dataset.yaml 1
 
 ### creat data infos
