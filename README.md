@@ -4,7 +4,15 @@ OpenPCDet에서 KaAI dataset을 이용해 모델을 훈련시킬 수 있도록 �
 
 ## Prepare for using KaAI dataset
 
-3/17 : 레이블이 없기 때문에 아직 업데이트하지 않았습니다.<br/><br/>
+### Creat data infos
+```
+python -m pcdet.datasets.kaai.kaai_dataset create_kaai_infos_w/o_gt_database tools/cfgs/dataset_configs/kitti_dataset.yaml
+```
+
+### Train
+```
+python tools/train.py --cfg_file ${CONFIG_FILE} --ckpt ${CKPT}
+```
 
 ## Pre-Annotation for KaAI dataset
 
