@@ -1,4 +1,4 @@
-CLASS_NAMES: ['Vehicle', 'Pedestrian', 'Cyclist']
+CLASS_NAMES: ['Car', 'Pedestrian', 'Cyclist', 'Truck']
 
 DATA_CONFIG:
     _BASE_CONFIG_: cfgs/dataset_configs/kaai_dataset.yaml
@@ -6,15 +6,14 @@ DATA_CONFIG:
         DISABLE_AUG_LIST: ['placeholder']
         AUG_CONFIG_LIST:
             - NAME: gt_sampling
-              USE_ROAD_PLANE: True
+              USE_ROAD_PLANE: False
               DB_INFO_PATH:
                   - kaai_dbinfos_train.pkl
               PREPARE: {
-                 filter_by_min_points: ['Vehicle:5', 'Pedestrian:5', 'Cyclist:5'],
-                 filter_by_difficulty: [-1],
+                 filter_by_min_points: ['Car:5', 'Pedestrian:5', 'Cyclist:5', 'Truck:5'],
               }
 
-              SAMPLE_GROUPS: ['Vehicle:15','Pedestrian:10', 'Cyclist:10']
+              SAMPLE_GROUPS: ['Car:13','Pedestrian:8', 'Cyclist:8', 'Truck:8']
               NUM_POINT_FEATURES: 4
               DATABASE_WITH_FAKELIDAR: False
               REMOVE_EXTRA_WIDTH: [0.0, 0.0, 0.0]
@@ -62,8 +61,8 @@ MODEL:
 
         ANCHOR_GENERATOR_CONFIG: [
             {
-                'class_name': 'Vehicle',
-                'anchor_sizes': [[3.9, 1.6, 1.56]],
+                'class_name': 'Car',
+                'anchor_sizes': [[4.35, 1.87, 1.65]],
                 'anchor_rotations': [0, 1.57],
                 'anchor_bottom_heights': [-1.78],
                 'align_center': False,
@@ -73,7 +72,7 @@ MODEL:
             },
             {
                 'class_name': 'Pedestrian',
-                'anchor_sizes': [[0.8, 0.6, 1.73]],
+                'anchor_sizes': [[0.62, 0.63, 1.67]],
                 'anchor_rotations': [0, 1.57],
                 'anchor_bottom_heights': [-0.6],
                 'align_center': False,
@@ -83,14 +82,24 @@ MODEL:
             },
             {
                 'class_name': 'Cyclist',
-                'anchor_sizes': [[1.76, 0.6, 1.73]],
+                'anchor_sizes': [[1.74, 1.05, 1.25]],
                 'anchor_rotations': [0, 1.57],
                 'anchor_bottom_heights': [-0.6],
                 'align_center': False,
                 'feature_map_stride': 8,
                 'matched_threshold': 0.5,
                 'unmatched_threshold': 0.35
-            }
+            },
+            {
+                'class_name': 'Truck',
+                'anchor_sizes': [[9.47, 2.64, 2.76]],
+                'anchor_rotations': [0, 1.57],
+                'anchor_bottom_heights': [-0.6],
+                'align_center': False,
+                'feature_map_stride': 8,
+                'matched_threshold': 0.6,
+                'unmatched_threshold': 0.45
+            }            
         ]
 
         TARGET_ASSIGNER_CONFIG:
