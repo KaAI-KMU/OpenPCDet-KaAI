@@ -3,6 +3,7 @@ import pickle
 import os
 import open3d
 import numpy as np
+import json
 
 from pcdet.ops.roiaware_pool3d import roiaware_pool3d_utils
 from pcdet.utils import box_utils, common_utils
@@ -44,20 +45,27 @@ class KaAIDataset(DatasetTemplate):
         self.logger.info('Total samples for KaAI dataset: %d' % (len(kaai_infos)))
 
     def get_label(self, idx):
-        label_file = self.root_split_path / 'labels' / ('%s.txt' % idx)
+        label_file = self.root_split_path / 'label' / ('%s.json' % idx)
         assert label_file.exists()
         with open(label_file, 'r') as f:
-            lines = f.readlines()
+            box_list = json.load(f)
 
         # [N, 8]: (x y z dx dy dz heading_angle category_id)
         gt_boxes = []
         gt_names = []
-        for line in lines:
-            line_list = line.strip().split(' ')
-            gt_boxes.append(line_list[:-1])
-            gt_names.append(line_list[-1])
+        for box in box_list:
+            position = np.array([val for _, val in box['psr']['position'].items()], np.float32)
+            scale = np.array([val for _, val in box['psr']['scale'].items()], np.float32)
+            heading = np.array([box['psr']['rotation']['z']], np.float32)
+            gt_boxes.append(np.concatenate([position, scale, heading], axis=0))
+            # TODO: 수정 필요. 이륜차는 하나로 통일
+            gt_name = box['obj_type'] if box['obj_type'] not in ['ScooterRider', 'Scooter', 'MotorcyleRider', 'Bicycle'] else 'Cyclist'
+            gt_names.append(gt_name)
+        
+        if len(gt_boxes)==0:
+            gt_boxes = np.array([[]], dtype=np.float32).reshape(0,8)
 
-        return np.array(gt_boxes, dtype=np.float32), np.array(gt_names)
+        return np.array(gt_boxes), np.array(gt_names)
 
     def get_lidar(self, idx):
         lidar_file = self.root_split_path / 'lidar' / ('%s.pcd' % idx)
@@ -176,6 +184,9 @@ class KaAIDataset(DatasetTemplate):
         with open(info_path, 'rb') as f:
             infos = pickle.load(f)
 
+        # statistics
+
+        sizes = {}
         for k in range(len(infos)):
             print('gt_database sample: %d/%d' % (k + 1, len(infos)))
             info = infos[k]
@@ -186,6 +197,8 @@ class KaAIDataset(DatasetTemplate):
             gt_boxes = annos['gt_boxes_lidar']
 
             num_obj = gt_boxes.shape[0]
+            if num_obj == 0:
+                continue
             point_indices = roiaware_pool3d_utils.points_in_boxes_cpu(
                 torch.from_numpy(points[:, 0:3]), torch.from_numpy(gt_boxes)
             ).numpy()  # (nboxes, npoints)
@@ -205,12 +218,17 @@ class KaAIDataset(DatasetTemplate):
                                'box3d_lidar': gt_boxes[i], 'num_points_in_gt': gt_points.shape[0]}
                     if names[i] in all_db_infos:
                         all_db_infos[names[i]].append(db_info)
+                        sizes[names[i]] += gt_boxes[i][3:6]
                     else:
                         all_db_infos[names[i]] = [db_info]
+                        sizes[names[i]] = gt_boxes[i][3:6].astype(np.float64)
+                    
 
         # Output the num of all classes in database
         for k, v in all_db_infos.items():
             print('Database %s: %d' % (k, len(v)))
+            l, w, h = sizes[k] / len(v)
+            print('Average %s size : (L=%f, W=%f, H=%f)' % (k, l, w, h))
 
         with open(db_info_save_path, 'wb') as f:
             pickle.dump(all_db_infos, f)
@@ -313,7 +331,7 @@ if __name__ == '__main__':
         if sys.argv[1] == 'create_kaai_infos':
             create_kaai_infos(
                 dataset_cfg=dataset_cfg,
-                class_names=['Vehicle', 'Pedestrian', 'Cyclist'],
+                class_names=['Car', 'Pedestrian', 'Cyclist', 'Truck'],
                 data_path=ROOT_DIR / 'data' / 'kaai',
                 save_path=ROOT_DIR / 'data' / 'kaai',
             )
@@ -326,7 +344,7 @@ if __name__ == '__main__':
         elif sys.argv[1] == 'create_kaai_infos_w/o_gt_database':
             create_kaai_infos(
                 dataset_cfg=dataset_cfg,
-                class_names=['Vehicle', 'Pedestrian', 'Cyclist'],
+                class_names=['Car', 'Pedestrian', 'Cyclist', 'Truck'],
                 data_path=ROOT_DIR / 'data' / 'kaai',
                 save_path=ROOT_DIR / 'data' / 'kaai',
                 has_label=False
