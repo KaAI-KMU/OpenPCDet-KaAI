@@ -33,5 +33,3 @@ python tools/pre_annotation.py --cfg_file ${CONFIG_FILE} --ckpt ${CKPT}
 checkpoint는 [OpenPCDet 원본 깃허브](https://github.com/open-mmlab/OpenPCDet#model-zoo)에서 다운받을 수 있습니다.<br/>
 다운받았거나 훈련한 모델의 checkpoint는 OpenPCDet-KaAI/tools에 넣습니다.<br/>
 Output은 output/pre_annotated_labels에 저장됩니다.
-
-3/17 : 현재는 pv_rcnn.yaml만 제공합니다
