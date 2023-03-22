@@ -19,7 +19,7 @@ def parse_config():
 
     parser.add_argument('--batch_size', type=int, default=None, required=False, help='batch size for training')
     parser.add_argument('--workers', type=int, default=4, help='number of workers for dataloader')
-    parser.add_argument('--thresholds', type=list, default=[0.0, 0.0, 0.0], help='assign score thresholds to objects') # [Vehicle, Pedestrian, Cyclist]
+    parser.add_argument('--thresholds', type=list, default=[0.4, 0.2, 0.2, 0.2], help='assign score thresholds to objects') # [Car, Pedestrian, Cyclist, Truck]
     parser.add_argument('--extra_tag', type=str, default='pre_annotated_labels', help='extra tag for this experiment')
     parser.add_argument('--ckpt', type=str, default=None, help='checkpoint to start from')
     parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm'], default='none')
@@ -73,11 +73,10 @@ def box_filtering_by_threshold(boxes, classes, scores, threshold_list):
     assert scores.shape[0] == num_threshold_type
     assert len(boxes.shape) == 2
 
-    selected = [i for i in range(boxes.shape[0])]
-    for i in range(num_threshold_type):
-        num_boxes = boxes.shape[0]
-        threshold = [threshold_list[i][classes[idx]-1] for idx in range(num_boxes)]
-        selected = [idx for idx in selected if scores[i][idx] > threshold[idx]]
+    num_boxes = boxes.shape[0]
+    thresholds = torch.tensor(threshold_list, device=classes.device).unsqueeze(0).repeat(num_boxes, 1, 1).\
+        gather(dim=2, index=classes.view(-1,1,1).repeat(1, num_threshold_type, 1)-1).reshape(num_threshold_type, -1)
+    selected = (scores > thresholds).all(dim=0)
 
     return selected
 
@@ -100,7 +99,7 @@ def pre_annotation(config, model, dataloader, output_dir, thresholds):
             boxes, labels, scores = pred_dicts[idx]['pred_boxes'], pred_dicts[idx]['pred_labels'], pred_dicts[idx]['pred_scores']
             selected = box_filtering_by_threshold(boxes=boxes, classes=labels, scores=scores, threshold_list=np.array(thresholds))
             boxes, labels, scores = boxes[selected], labels[selected], scores[selected]
-            if False: # for debugging
+            if True: # for debugging
                 from visual_utils import open3d_vis_utils as V
                 V.draw_scenes(points=batch_dict['points'][:,1:], ref_boxes=boxes)
                 
