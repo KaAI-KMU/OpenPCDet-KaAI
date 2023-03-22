@@ -9,7 +9,7 @@ OpenPCDet에서 KaAI dataset을 이용해 모델을 훈련시킬 수 있도록 �
     
 ### Creat data infos
 ```
-python -m pcdet.datasets.kaai.kaai_dataset create_kaai_infos_w/o_gt_database tools/cfgs/dataset_configs/kitti_dataset.yaml
+python -m pcdet.datasets.kaai.kaai_dataset create_kaai_infos tools/cfgs/dataset_configs/kaai_dataset.yaml
 ```
 
 ### Train
