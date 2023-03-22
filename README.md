@@ -39,3 +39,6 @@ Output은 output/pre_annotated_labels에 저장됩니다.
 
 TODO
 1. Evaluation code 디버깅하기
+2. Split dataset for pre-annotation/training
+
+[Weights of model which trained with 100 labeled kaai dataset](https://drive.google.com/file/d/1iZ__u2UJ8UJjhtL2-tLuDmW2jDvlSxch/view?usp=share_link)
