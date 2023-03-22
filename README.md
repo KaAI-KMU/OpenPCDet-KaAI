@@ -3,7 +3,16 @@
 OpenPCDet에서 KaAI dataset을 이용해 모델을 훈련시킬 수 있도록 구현하였습니다.<br/><br/>
 
 ## Prepare for using KaAI dataset
-
+```
+OpenPCDet
+├── data
+│   ├── kaai
+│   │   │── ImageSets
+│   │   │── training
+│   │   │   ├──label & lidar
+├── pcdet
+├── tools
+```
 ### ImageSet generation
     python -m pcdet.datasets.kaai.kaai_dataset generate_imagesets tools/cfgs/dataset_configs/kaai_dataset.yaml 0
     
